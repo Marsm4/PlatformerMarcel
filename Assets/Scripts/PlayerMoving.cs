@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerMoving : MonoBehaviour
@@ -5,18 +6,19 @@ public class PlayerMoving : MonoBehaviour
     public float speed = 5f;
     public float jumpForce = 7f;
     public LayerMask groundLayer;
-    public LayerMask spikeLayer; // Добавляем слой для шипов
     private Rigidbody2D rb;
     private Animator animator;
     private bool isGrounded;
-    private Vector3 startPosition; // Стартовая позиция для респавна
+    private Vector3 startPosition;
+    private AudioSource audioSource;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
         rb.freezeRotation = true;
-        startPosition = transform.position; // Запоминаем стартовую позицию
+        startPosition = transform.position;
     }
 
     void Update()
@@ -26,8 +28,12 @@ public class PlayerMoving : MonoBehaviour
         rb.velocity = new Vector2(move * speed, rb.velocity.y);
 
         // Поворот персонажа
-        if (move > 0) transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        if (move < 0) transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        if (move != 0)
+        {
+            transform.localScale = new Vector3(Mathf.Sign(move) * Mathf.Abs(transform.localScale.x),
+                                transform.localScale.y,
+                                transform.localScale.z);
+        }
 
         // Анимация бега
         animator.SetBool("isRunning", move != 0);
@@ -42,30 +48,17 @@ public class PlayerMoving : MonoBehaviour
         }
     }
 
-    // Обработка столкновений
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        // Проверяем, столкнулись ли с объектом на слое шипов
-        if (((1 << collision.gameObject.layer) & spikeLayer) != 0)
-        {
-            Die();
-        }
-    }
-
-    // Обработка триггеров (если шипы используют триггеры)
-    private void OnTriggerEnter2D(Collider2D collider)
-    {
-        if (((1 << collider.gameObject.layer) & spikeLayer) != 0)
-        {
-            Die();
-        }
-    }
-
-    // "Смерть" игрока
-
     public void Die()
     {
-        transform.position = startPosition; // Возвращаем на стартовую позицию
-        rb.velocity = Vector2.zero; // Сбрасываем скорость
+        transform.position = startPosition;
+        rb.velocity = Vector2.zero;
+    }
+
+    public IEnumerator Respawn()
+    {
+        GetComponent<SpriteRenderer>().enabled = false;
+        yield return new WaitForSeconds(1f);
+        transform.position = startPosition;
+        GetComponent<SpriteRenderer>().enabled = true;
     }
 }

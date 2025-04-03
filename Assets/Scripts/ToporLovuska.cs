@@ -1,33 +1,38 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class ToporLovuska : MonoBehaviour
+public class AxeTrap : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float swingAngle = 45f; // Угол колебания в градусах
-    public float swingSpeed = 1f; // Скорость колебания
+    public float swingAngle = 45f;
+    public float swingSpeed = 1f;
 
     [Header("Damage Settings")]
-    public LayerMask playerLayer; // Слой игрока
-    public Transform pivotPoint; // Центральная точка вращения
+    public LayerMask playerLayer;
+    public Transform pivotPoint;
+
+    [Header("Effects")]
+    public AudioClip hitSound;
+    public Animator animator; // Ссылка на аниматор
 
     private float currentAngle;
     private bool isSwingingRight = true;
+    private AudioSource audioSource;
 
     void Start()
     {
-        // Если pivotPoint не назначен, используем текущую позицию
         if (pivotPoint == null)
             pivotPoint = transform;
 
-        // Начальный угол
+        // Получаем или создаем AudioSource
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = gameObject.AddComponent<AudioSource>();
+
         currentAngle = -swingAngle;
     }
 
     void Update()
     {
-        // Вычисляем новое положение
         if (isSwingingRight)
         {
             currentAngle += swingSpeed * Time.deltaTime;
@@ -41,7 +46,6 @@ public class ToporLovuska : MonoBehaviour
                 isSwingingRight = true;
         }
 
-        // Вращаем топор вокруг точки крепления
         transform.RotateAround(pivotPoint.position, Vector3.forward,
                              isSwingingRight ? swingSpeed : -swingSpeed);
     }
@@ -51,9 +55,21 @@ public class ToporLovuska : MonoBehaviour
         if (((1 << other.gameObject.layer) & playerLayer) != 0)
         {
             PlayerMoving player = other.GetComponent<PlayerMoving>();
-            if (player != null) // Проверка на случай, если у объекта нет скрипта
+            if (player != null)
             {
-                player.Die(); // Теперь метод доступен
+                player.Die();
+
+                // Проверяем наличие аниматора перед использованием
+                if (animator != null)
+                {
+                    animator.SetTrigger("Hit");
+                }
+
+                // Воспроизводим звук
+                if (hitSound != null)
+                {
+                    AudioSource.PlayClipAtPoint(hitSound, transform.position);
+                }
             }
         }
     }
