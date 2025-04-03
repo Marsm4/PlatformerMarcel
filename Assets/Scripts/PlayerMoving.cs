@@ -62,7 +62,8 @@ public class PlayerMoving : MonoBehaviour
     }
 
     // "Смерть" игрока
-    private void Die()
+
+    public void Die()
     {
         transform.position = startPosition; // Возвращаем на стартовую позицию
         rb.velocity = Vector2.zero; // Сбрасываем скорость
