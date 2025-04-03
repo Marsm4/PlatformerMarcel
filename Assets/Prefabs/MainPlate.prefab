@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 886361900947372575}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: MainPlate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 6682245688955908140}
   - component: {fileID: 4046686029879863065}
   - component: {fileID: 8577804686434254390}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Grass_Oneway
   m_TagString: Untagged
   m_Icon: {fileID: 0}
