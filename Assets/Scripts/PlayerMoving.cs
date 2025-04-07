@@ -105,5 +105,11 @@ public class PlayerMoving : MonoBehaviour
     {
         transform.position = startPosition;
         rb.velocity = Vector2.zero;
+
+        // Отнимаем жизнь через GameManager
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.LoseLife();
+        }
     }
 }
