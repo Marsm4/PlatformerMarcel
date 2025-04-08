@@ -8,20 +8,20 @@ public class GameManager : MonoBehaviour
 
     [Header("Жизни")]
     public int maxLives = 3;
-    public int currentLives;
-    public Image[] livesImages; // Массив изображений сердечек
+    private int currentLives;
+    public Image[] livesImages;
 
     [Header("Очки")]
     public int score = 0;
     public Text scoreText;
 
-    [Header("Конец игры")]
+    [Header("Панели")]
     public GameObject gameOverPanel;
-    public Text finalScoreText;
-    public AudioClip gameOverSound;
-
-    [Header("Победа")]
     public GameObject winPanel;
+    public Text resultText;
+
+    [Header("Звуки")]
+    public AudioClip gameOverSound;
     public AudioClip winSound;
 
     private AudioSource audioSource;
@@ -33,6 +33,10 @@ public class GameManager : MonoBehaviour
 
         currentLives = maxLives;
         audioSource = GetComponent<AudioSource>();
+
+        // Скрываем панели при старте
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (winPanel != null) winPanel.SetActive(false);
     }
 
     public void LoseLife()
@@ -62,22 +66,23 @@ public class GameManager : MonoBehaviour
 
     void GameOver()
     {
-        Time.timeScale = 0;
+        Time.timeScale = 0f; // Останавливаем игру
         gameOverPanel.SetActive(true);
-        finalScoreText.text = "Вы проиграли!\nСобрано монет: " + score;
+        resultText.text = $"Вы проиграли!\nСобрано монет: {score}";
         PlaySound(gameOverSound);
     }
 
     public void WinGame()
     {
-        Time.timeScale = 0;
+        Time.timeScale = 0f; // Останавливаем игру
         winPanel.SetActive(true);
+        resultText.text = $"Победа!\nСобрано монет: {score}";
         PlaySound(winSound);
     }
 
     public void RestartGame()
     {
-        Time.timeScale = 1;
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
