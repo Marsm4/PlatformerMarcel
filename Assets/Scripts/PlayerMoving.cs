@@ -135,11 +135,26 @@ public class PlayerMoving : MonoBehaviour
         canClimb = contact;
         currentLadder = contact ? ladder : null;
     }
-
+    private bool isDead = false;
     public void Die()
     {
+        if (isDead) return; // Если уже мертв, выходим
+
+        isDead = true;
         transform.position = startPosition;
         rb.velocity = Vector2.zero;
-        if (GameManager.Instance != null) GameManager.Instance.LoseLife();
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.LoseLife();
+
+        // Через 1 секунду снова разрешаем смерть
+        Invoke("ResetDeath", 1f);
     }
+
+    private void ResetDeath()
+    {
+        isDead = false;
+    }
+
+
 }

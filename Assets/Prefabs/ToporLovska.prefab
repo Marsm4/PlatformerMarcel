@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 2441834733959900227}
   - component: {fileID: 5696175982723795169}
   - component: {fileID: 252571377068517370}
-  - component: {fileID: 3157805426732363447}
+  - component: {fileID: 8133524081190078507}
   m_Layer: 0
   m_Name: Axe_Trap
   m_TagString: Untagged
@@ -297,7 +297,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.3156023, y: 0.59498775}
   m_EdgeRadius: 0
---- !u!114 &3157805426732363447
+--- !u!114 &8133524081190078507
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -306,7 +306,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 7938754360094584391}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e1fcb7781890f443a4acb8373f4f09c, type: 3}
+  m_Script: {fileID: 11500000, guid: bec2fac0451d98d4ca41ced9b09ac376, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trapSound: {fileID: 0}
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  deathSound: {fileID: 0}

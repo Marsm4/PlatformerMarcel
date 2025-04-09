@@ -12,18 +12,18 @@ public class AxeTrap : MonoBehaviour
 
     [Header("Effects")]
     public AudioClip hitSound;
-    public Animator animator; // Ссылка на аниматор
+    public Animator animator;
 
     private float currentAngle;
     private bool isSwingingRight = true;
     private AudioSource audioSource;
+    private bool trapActive = true;
 
     void Start()
     {
         if (pivotPoint == null)
             pivotPoint = transform;
 
-        // Получаем или создаем AudioSource
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -52,25 +52,28 @@ public class AxeTrap : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (((1 << other.gameObject.layer) & playerLayer) != 0)
+        if (trapActive && ((1 << other.gameObject.layer) & playerLayer) != 0)
         {
+            trapActive = false;
+
             PlayerMoving player = other.GetComponent<PlayerMoving>();
             if (player != null)
             {
                 player.Die();
 
-                // Проверяем наличие аниматора перед использованием
                 if (animator != null)
-                {
                     animator.SetTrigger("Hit");
-                }
 
-                // Воспроизводим звук
                 if (hitSound != null)
-                {
                     AudioSource.PlayClipAtPoint(hitSound, transform.position);
-                }
             }
+
+            Invoke("ActivateTrap", 1f);
         }
+    }
+
+    void ActivateTrap()
+    {
+        trapActive = true;
     }
 }
