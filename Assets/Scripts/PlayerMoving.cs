@@ -5,7 +5,9 @@ public class PlayerMoving : MonoBehaviour
     [Header("Movement Settings")]
     public float speed = 5f;
     public float jumpForce = 7f;
+    public float climbSpeed = 3f;
     public LayerMask groundLayer;
+    public float ladderHorizontalExitForce = 2f;
 
     [Header("Components")]
     private Rigidbody2D rb;
@@ -15,7 +17,8 @@ public class PlayerMoving : MonoBehaviour
 
     [Header("State")]
     public bool isClimbing;
-    private bool canClimb;
+    public bool canClimb;
+    private Collider2D currentLadder;
 
     void Start()
     {
@@ -35,10 +38,23 @@ public class PlayerMoving : MonoBehaviour
 
     void HandleMovement()
     {
-        if (isClimbing) return;
-
         float move = Input.GetAxisRaw("Horizontal");
-        rb.velocity = new Vector2(move * speed, rb.velocity.y);
+
+        if (isClimbing)
+        {
+            // Горизонтальное движение на лестнице
+            rb.velocity = new Vector2(move * speed * 0.7f, rb.velocity.y);
+
+            // Проверка выхода с лестницы вбок
+            if (move != 0 && !IsTouchingLadder())
+            {
+                ExitLadder(new Vector2(move * ladderHorizontalExitForce, 0));
+            }
+        }
+        else
+        {
+            rb.velocity = new Vector2(move * speed, rb.velocity.y);
+        }
 
         if (move != 0)
         {
@@ -51,49 +67,62 @@ public class PlayerMoving : MonoBehaviour
 
     void HandleJump()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isClimbing)
+        if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || isClimbing))
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            if (isClimbing) ExitLadder(new Vector2(0, jumpForce * 0.7f));
+            else rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
     }
 
     void HandleClimbing()
     {
-        if (!canClimb) return;
+        if (!canClimb && isClimbing)
+        {
+            ExitLadder(Vector2.zero);
+        }
+
+        if (canClimb && !isClimbing && Input.GetAxisRaw("Vertical") != 0)
+        {
+            StartClimbing();
+        }
 
         if (isClimbing)
         {
-            rb.gravityScale = 0;
+            float verticalInput = Input.GetAxisRaw("Vertical");
+            rb.velocity = new Vector2(rb.velocity.x, verticalInput * climbSpeed);
         }
-        else
+    }
+
+    void StartClimbing()
+    {
+        isClimbing = true;
+        rb.gravityScale = 0;
+        // Центрируем игрока на лестнице
+        if (currentLadder != null)
         {
-            rb.gravityScale = 3f;
+            Vector2 ladderCenter = currentLadder.bounds.center;
+            transform.position = new Vector2(ladderCenter.x, transform.position.y);
         }
+    }
+
+    void ExitLadder(Vector2 exitForce)
+    {
+        isClimbing = false;
+        canClimb = false;
+        rb.gravityScale = 1;
+        rb.velocity += exitForce;
+    }
+
+    bool IsTouchingLadder()
+    {
+        if (currentLadder == null) return false;
+        return GetComponent<Collider2D>().IsTouching(currentLadder);
     }
 
     void UpdateAnimations()
     {
         animator.SetBool("isRunning", Mathf.Abs(rb.velocity.x) > 0.1f && !isClimbing);
-        animator.SetBool("isClimbing", isClimbing);
-    }
-
-    public void Climb(float speed)
-    {
-        if (!canClimb) return;
-
-        isClimbing = true;
-        rb.velocity = new Vector2(0, speed);
-    }
-
-    public void StopClimbing()
-    {
-        isClimbing = false;
-    }
-
-    public void LadderContact(bool contact)
-    {
-        canClimb = contact;
-        if (!contact) isClimbing = false;
+        animator.SetBool("isClimbing", isClimbing && Mathf.Abs(Input.GetAxisRaw("Vertical")) > 0.1f);
     }
 
     void FixedUpdate()
@@ -101,15 +130,16 @@ public class PlayerMoving : MonoBehaviour
         isGrounded = Physics2D.OverlapCircle(transform.position, 0.4f, groundLayer);
     }
 
+    public void SetLadder(Collider2D ladder, bool contact)
+    {
+        canClimb = contact;
+        currentLadder = contact ? ladder : null;
+    }
+
     public void Die()
     {
         transform.position = startPosition;
         rb.velocity = Vector2.zero;
-
-        // Отнимаем жизнь через GameManager
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.LoseLife();
-        }
+        if (GameManager.Instance != null) GameManager.Instance.LoseLife();
     }
 }

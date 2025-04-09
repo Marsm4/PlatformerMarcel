@@ -3,12 +3,10 @@ using UnityEngine;
 public class Lestnica : MonoBehaviour
 {
     [Header("Settings")]
-    public float climbSpeed = 3f;
-    public float topExitOffset = 0.5f;
+    public float snapDistance = 0.3f;
     public AudioClip climbingSound;
 
-    private bool playerInLadderZone;
-    private PlayerMoving playerMoving;
+    private PlayerMoving player;
     private AudioSource audioSource;
 
     void Start()
@@ -18,45 +16,29 @@ public class Lestnica : MonoBehaviour
             audioSource = gameObject.AddComponent<AudioSource>();
     }
 
-    void Update()
-    {
-        if (playerInLadderZone && playerMoving != null)
-        {
-            if (Input.GetKey(KeyCode.W))  // Игрок нажимает W
-            {
-                playerMoving.Climb(climbSpeed);
-
-                // Когда игрок покидает лестницу, остановить подъем
-                if (transform.position.y + GetComponent<Collider2D>().bounds.extents.y < playerMoving.transform.position.y - topExitOffset)
-                {
-                    playerMoving.StopClimbing();
-                    playerInLadderZone = false;
-                }
-            }
-            else if (Input.GetKeyUp(KeyCode.W))  // Игрок отпускает W
-            {
-                playerMoving.StopClimbing();
-            }
-        }
-    }
-
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            playerInLadderZone = true;
-            playerMoving = other.GetComponent<PlayerMoving>();
-            playerMoving.LadderContact(true);
+            player = other.GetComponent<PlayerMoving>();
+            player.SetLadder(GetComponent<Collider2D>(), true);
+
+            // Автоматическое притягивание к центру лестницы
+            if (Mathf.Abs(other.transform.position.x - transform.position.x) > snapDistance)
+            {
+                Vector2 newPos = other.transform.position;
+                newPos.x = transform.position.x;
+                other.transform.position = newPos;
+            }
         }
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && playerMoving != null)
+        if (other.CompareTag("Player") && player != null)
         {
-            playerInLadderZone = false;
-            playerMoving.StopClimbing();
-            playerMoving.LadderContact(false);
+            player.SetLadder(null, false);
+            player = null;
         }
     }
 }
