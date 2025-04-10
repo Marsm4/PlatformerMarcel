@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-
+   public Vector3 lastCheckpointPosition;
     [Header("Жизни")]
     public int maxLives = 3;
     private int currentLives;
@@ -26,19 +26,44 @@ public class GameManager : MonoBehaviour
 
     private AudioSource audioSource;
 
+    /*  void Awake()
+      {
+          if (Instance == null) Instance = this;
+          else Destroy(gameObject);
+          lastCheckpointPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
+          currentLives = maxLives;
+          audioSource = GetComponent<AudioSource>();
+
+          // Скрываем панели при старте
+          if (gameOverPanel != null) gameOverPanel.SetActive(false);
+          if (winPanel != null) winPanel.SetActive(false);
+      }
+    */
     void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
+        // Инициализируем чекпоинт стартовой позицией игрока
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            lastCheckpointPosition = player.transform.position;
+        }
+
         currentLives = maxLives;
-        audioSource = GetComponent<AudioSource>();
-
-        // Скрываем панели при старте
-        if (gameOverPanel != null) gameOverPanel.SetActive(false);
-        if (winPanel != null) winPanel.SetActive(false);
+        // ... остальной код
     }
-
+    public void SetCheckpoint(Vector3 position)
+    {
+        lastCheckpointPosition = position;
+    }
+    public void RespawnPlayer()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        player.transform.position = lastCheckpointPosition;
+        // Дополнительные действия: сброс здоровья, анимация и т.д.
+    }
     public void LoseLife()
     {
         currentLives--;

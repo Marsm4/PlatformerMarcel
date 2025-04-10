@@ -136,7 +136,7 @@ public class PlayerMoving : MonoBehaviour
         currentLadder = contact ? ladder : null;
     }
     private bool isDead = false;
-    public void Die()
+    /*public void Die()
     {
         if (isDead) return; // Если уже мертв, выходим
 
@@ -148,6 +148,20 @@ public class PlayerMoving : MonoBehaviour
             GameManager.Instance.LoseLife();
 
         // Через 1 секунду снова разрешаем смерть
+        Invoke("ResetDeath", 1f);
+    }*/
+    public void Die()
+    {
+        if (isDead) return;
+
+        isDead = true;
+        // Заменяем startPosition на позицию из GameManager
+        transform.position = GameManager.Instance.lastCheckpointPosition;
+        rb.velocity = Vector2.zero;
+
+        if (GameManager.Instance != null)
+            GameManager.Instance.LoseLife();
+
         Invoke("ResetDeath", 1f);
     }
 

@@ -1,12 +1,9 @@
-/*using UnityEngine;
+using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
-    [Header("Settings")]
-    public int checkpointID;
-    public Sprite activeSprite;
-    public ParticleSystem activationEffect;
-
+    [Header("Визуальные эффекты")]
+    public Sprite activeSprite; // Спрайт активированного чекпоинта
     private SpriteRenderer spriteRenderer;
     private bool isActive;
 
@@ -17,13 +14,22 @@ public class Checkpoint : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (!isActive && other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !isActive)
         {
-            isActive = true;
-            if (activeSprite != null) spriteRenderer.sprite = activeSprite;
-            if (activationEffect != null) activationEffect.Play();
-
-            GameManager.Instance.SetCheckpoint(checkpointID, transform.position);
+            ActivateCheckpoint();
         }
     }
-}*/
+
+    void ActivateCheckpoint()
+    {
+        isActive = true;
+        // Меняем спрайт
+        if (activeSprite != null) spriteRenderer.sprite = activeSprite;
+
+        // Сохраняем позицию в GameManager
+        GameManager.Instance.SetCheckpoint(transform.position);
+
+        // Эффекты (опционально)
+        GetComponent<AudioSource>()?.Play(); // Звук активации
+    }
+}
