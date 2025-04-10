@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayerMoving : MonoBehaviour
 {
@@ -20,12 +22,21 @@ public class PlayerMoving : MonoBehaviour
     public bool canClimb;
     private Collider2D currentLadder;
 
+    [Header("Бессмертие")]
+    public bool isImmortal = false;
+    public float blinkSpeed = 10f;
+    private Color originalColor;
+    private SpriteRenderer spriteRenderer;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         rb.freezeRotation = true;
         startPosition = transform.position;
+
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        originalColor = spriteRenderer.color;
     }
 
     void Update()
@@ -153,7 +164,7 @@ public class PlayerMoving : MonoBehaviour
     public void Die()
     {
         if (isDead) return;
-
+        if (isImmortal || isDead) return;
         isDead = true;
         // Заменяем startPosition на позицию из GameManager
         transform.position = GameManager.Instance.lastCheckpointPosition;
@@ -168,6 +179,30 @@ public class PlayerMoving : MonoBehaviour
     private void ResetDeath()
     {
         isDead = false;
+    }
+    public void ActivateImmortality(float duration)
+    {
+        if (!isImmortal)
+        {
+            StartCoroutine(ImmortalityEffect(duration));
+        }
+    }
+
+    IEnumerator ImmortalityEffect(float duration)
+    {
+        isImmortal = true;
+        float timer = 0;
+
+        while (timer < duration)
+        {
+            // Эффект мерцания
+            spriteRenderer.color = Color.Lerp(originalColor, Color.cyan, Mathf.PingPong(timer * blinkSpeed, 1));
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        spriteRenderer.color = originalColor;
+        isImmortal = false;
     }
 
 

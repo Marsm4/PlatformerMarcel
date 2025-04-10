@@ -118,4 +118,13 @@ public class GameManager : MonoBehaviour
             audioSource.PlayOneShot(clip);
         }
     }
+
+    public void AddLife(int amount)
+    {
+        currentLives = Mathf.Min(currentLives + amount, maxLives);
+        UpdateLivesUI();
+
+        // Визуальный эффект
+        Debug.Log($"Получено {amount} жизней! Всего: {currentLives}");
+    }
 }
