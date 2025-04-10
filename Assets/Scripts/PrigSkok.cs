@@ -45,18 +45,9 @@ public class BounceBridge : MonoBehaviour
                 // Визуальные эффекты
                 if (bridgeAnimator != null)
                 {
-                    bridgeAnimator.Play(bounceAnimationName, 0, 0f);
-                }
-
-                if (bounceParticles != null)
-                {
-                    bounceParticles.Play();
-                }
-
-                // Звуковой эффект
-                if (bounceSound != null && audioSource != null)
-                {
-                    audioSource.PlayOneShot(bounceSound);
+                    bridgeAnimator.SetTrigger("Press");
+                    // Для параметра float (если используется):
+                    bridgeAnimator.SetFloat("BouncePower", collision.relativeVelocity.magnitude);
                 }
             }
         }
