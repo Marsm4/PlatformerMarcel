@@ -15,17 +15,28 @@ public class Bomba : MonoBehaviour
     public float blinkInterval = 0.2f; // Интервал для мигания
     public Color blinkColor = Color.red; // Цвет мигания
 
+    [Header("Sound Effects")]
+    public AudioClip detectionSound; // Звук при обнаружении игрока (когда начинает мигать)
+    public AudioClip explosionSound; // Звук взрыва
+    [Range(0, 1)] public float soundVolume = 0.7f; // Громкость звуков
+
     private Vector3 startPosition; // Начальная позиция
     private bool movingRight = true; // Флаг направления движения
     private SpriteRenderer spriteRenderer; // Компонент для отрисовки
     private Color originalColor; // Исходный цвет спрайта
     private bool isExploding = false; // Флаг для взрыва
+    private AudioSource audioSource; // Компонент для воспроизведения звуков
 
     void Start()
     {
         startPosition = transform.position; // Сохраняем стартовую позицию
         spriteRenderer = GetComponent<SpriteRenderer>(); // Получаем компонент SpriteRenderer
         originalColor = spriteRenderer.color; // Запоминаем исходный цвет спрайта
+        audioSource = GetComponent<AudioSource>(); // Получаем компонент AudioSource
+        if (audioSource == null) // Если компонента нет - добавляем
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -67,6 +78,11 @@ public class Bomba : MonoBehaviour
     void StartExplosion()
     {
         isExploding = true;
+        // Воспроизводим звук обнаружения
+        if (detectionSound != null)
+        {
+            audioSource.PlayOneShot(detectionSound, soundVolume);
+        }
         InvokeRepeating("Blink", 0f, blinkInterval); // Начинаем мигание
         Invoke("Explode", explosionDelay); // Запускаем взрыв с задержкой
     }
@@ -80,6 +96,12 @@ public class Bomba : MonoBehaviour
     // Выполняем взрыв
     void Explode()
     {
+        // Воспроизводим звук взрыва
+        if (explosionSound != null)
+        {
+            audioSource.PlayOneShot(explosionSound, soundVolume);
+        }
+
         // Создаем эффект взрыва
         if (explosionEffect != null)
         {
@@ -97,7 +119,7 @@ public class Bomba : MonoBehaviour
         }
 
         // Уничтожаем бомбу
-        Destroy(gameObject);
+        Destroy(gameObject, 0.1f); // Небольшая задержка чтобы звук успел проиграться
     }
 
     // Рисуем радиус обнаружения в редакторе
