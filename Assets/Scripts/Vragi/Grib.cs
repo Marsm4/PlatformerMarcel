@@ -13,16 +13,28 @@ public class Vragi : MonoBehaviour
     public int contactDamage = 1;          // Урон при контакте
     public float bounceForce = 8f;         // Сила отталкивания игрока
 
+    [Header("Sound Effects")]
+    public AudioClip stompSound;           // Звук при убийстве прыжком
+    [Range(0, 1)] public float soundVolume = 0.7f; // Громкость звука
+
     private Vector3 startPosition;         // Начальная позиция гриба
     private Vector3 targetPosition;        // Целевая позиция (куда движется гриб)
     private bool isMovingRight = true;     // Направление движения
     private Rigidbody2D rb;
+    private AudioSource audioSource;       // Для воспроизведения звуков
 
     void Start()
     {
         startPosition = transform.position;        // Устанавливаем начальную позицию
         targetPosition = startPosition + Vector3.right * moveDistance; // Устанавливаем начальную целевую точку
         rb = GetComponent<Rigidbody2D>();
+
+        // Получаем или добавляем компонент AudioSource
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
     }
 
     void Update()
@@ -50,6 +62,12 @@ public class Vragi : MonoBehaviour
         {
             if (collision.contacts[0].normal.y < -0.7f) // Удар сверху
             {
+                // Воспроизводим звук удара
+                if (stompSound != null)
+                {
+                    AudioSource.PlayClipAtPoint(stompSound, transform.position, soundVolume);
+                }
+
                 // Подбрасываем игрока
                 collision.gameObject.GetComponent<Rigidbody2D>().velocity =
                     new Vector2(0, bounceForce);
