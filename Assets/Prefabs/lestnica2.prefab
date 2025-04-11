@@ -130,9 +130,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 276f40327db58b04f8195911579c33b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  climbSpeed: 3
-  exitOffset: 1
-  climbingSound: {fileID: 0}
+  snapDistance: 1
+  climbingSound: {fileID: 8300000, guid: 7cc21c18a2da01345922a2d871c954c7, type: 3}
 --- !u!61 &6802391086851726191
 BoxCollider2D:
   m_ObjectHideFlags: 0

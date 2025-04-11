@@ -11,13 +11,14 @@ public class UrovenMenu : MonoBehaviour
     public Button level1Button;
     public Button level2Button;
     public Button level3Button;
-
+    public Button level4Button;
     void Start()
     {
         // Назначаем обработчики событий для кнопок
         level1Button.onClick.AddListener(() => LoadLevel("Level1"));
         level2Button.onClick.AddListener(() => LoadLevel("Level2"));
         level3Button.onClick.AddListener(() => LoadLevel("Level3"));
+        level4Button.onClick.AddListener(() => LoadLevel("Level4"));
     }
 
     // Метод для загрузки уровня по имени
