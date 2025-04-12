@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7039123981082138063}
   m_Layer: 0
   m_Name: pngwing.com
-  m_TagString: Untagged
+  m_TagString: Vrag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -136,6 +136,9 @@ MonoBehaviour:
   detectionSound: {fileID: 8300000, guid: 1940e2e28909ad44eb7371107c64b0c9, type: 3}
   explosionSound: {fileID: 8300000, guid: 7707d71db48621447aee9fc5b3070fa6, type: 3}
   soundVolume: 0.7
+  shardPrefab: {fileID: 5841345087943163520, guid: 943f93e5fd4a91d4c8d03e45b9bb92d2, type: 3}
+  shardCount: 8
+  shardForce: 5
 --- !u!58 &7039123981082138063
 CircleCollider2D:
   m_ObjectHideFlags: 0

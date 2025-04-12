@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 6682245688955908140}
   - component: {fileID: 4046686029879863065}
   - component: {fileID: 8577804686434254390}
+  - component: {fileID: 4826236735551771400}
   m_Layer: 6
   m_Name: Grass_Oneway
   m_TagString: Untagged
@@ -60,7 +61,7 @@ Transform:
   m_GameObject: {fileID: 8315520375953810109}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.132, y: 0.182, z: 0}
   m_LocalScale: {x: 5.6139, y: 5.6139, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -190,3 +191,21 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &4826236735551771400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8315520375953810109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3782bfdaeeb3114793da79d8083cfa2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  disappearDelay: 7
+  reappearDelay: 5
+  disappearParticles: {fileID: 0}
+  reappearParticles: {fileID: 0}
+  disappearSound: {fileID: 0}
+  reappearSound: {fileID: 0}

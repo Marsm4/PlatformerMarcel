@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1424599185436817558}
   m_Layer: 0
   m_Name: statik
-  m_TagString: Untagged
+  m_TagString: Vrag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

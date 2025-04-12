@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerMoving : MonoBehaviour
@@ -16,6 +15,7 @@ public class PlayerMoving : MonoBehaviour
     private Animator animator;
     private bool isGrounded;
     private Vector3 startPosition;
+    private SpriteRenderer spriteRenderer;
 
     [Header("State")]
     public bool isClimbing;
@@ -26,16 +26,35 @@ public class PlayerMoving : MonoBehaviour
     public bool isImmortal = false;
     public float blinkSpeed = 10f;
     private Color originalColor;
-    private SpriteRenderer spriteRenderer;
+
+    [Header("Sound Effects")]
+    public AudioClip jumpSound;
+    public AudioClip[] footstepSounds;
+    public float footstepInterval = 0.3f;
+    public AudioClip hitByEnemySound; // Новый звук столкновения
+
+    private AudioSource audioSource;
+   // private float footstepTimer = 0f;
+    private bool isDead = false;
+
+    private bool hasJumped = false;
+    private bool isFootstepPlaying = false;
+    private Coroutine jumpCoroutine = null;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
+
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+
         rb.freezeRotation = true;
         startPosition = transform.position;
-
-        spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
     }
 
@@ -45,6 +64,46 @@ public class PlayerMoving : MonoBehaviour
         HandleJump();
         HandleClimbing();
         UpdateAnimations();
+        HandleFootsteps();
+    }
+
+    void HandleFootsteps()
+    {
+        bool isMovingHorizontally = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D);
+
+        if (isGrounded && isMovingHorizontally && !isClimbing)
+        {
+            if (!isFootstepPlaying)
+            {
+                StartFootstepLoop();
+            }
+        }
+        else
+        {
+            StopFootstepLoop();
+        }
+    }
+
+    void StartFootstepLoop()
+    {
+        if (footstepSounds.Length > 0)
+        {
+            isFootstepPlaying = true;
+            audioSource.loop = true;
+            audioSource.clip = footstepSounds[Random.Range(0, footstepSounds.Length)];
+            audioSource.Play();
+        }
+    }
+
+    void StopFootstepLoop()
+    {
+        if (isFootstepPlaying)
+        {
+            isFootstepPlaying = false;
+            audioSource.Stop();
+            audioSource.loop = false;
+            audioSource.clip = null;
+        }
     }
 
     void HandleMovement()
@@ -53,10 +112,8 @@ public class PlayerMoving : MonoBehaviour
 
         if (isClimbing)
         {
-            // Горизонтальное движение на лестнице
             rb.velocity = new Vector2(move * speed * 0.7f, rb.velocity.y);
 
-            // Проверка выхода с лестницы вбок
             if (move != 0 && !IsTouchingLadder())
             {
                 ExitLadder(new Vector2(move * ladderHorizontalExitForce, 0));
@@ -80,8 +137,50 @@ public class PlayerMoving : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || isClimbing))
         {
-            if (isClimbing) ExitLadder(new Vector2(0, jumpForce * 0.7f));
-            else rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            hasJumped = true;
+
+            if (isClimbing)
+            {
+                ExitLadder(new Vector2(0, jumpForce * 0.7f));
+            }
+            else
+            {
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                PlayJumpSound();
+            }
+        }
+
+        if (isGrounded)
+        {
+            hasJumped = false;
+        }
+    }
+
+    void PlayJumpSound()
+    {
+        if (jumpSound != null && hasJumped)
+        {
+            if (jumpCoroutine != null)
+            {
+                StopCoroutine(jumpCoroutine);
+            }
+
+            jumpCoroutine = StartCoroutine(PlayJumpSoundLimited(jumpSound, 1f));
+            hasJumped = false;
+        }
+    }
+
+    IEnumerator PlayJumpSoundLimited(AudioClip clip, float maxDuration)
+    {
+        audioSource.Stop();
+        audioSource.clip = clip;
+        audioSource.loop = false;
+        audioSource.Play();
+        yield return new WaitForSeconds(maxDuration);
+        if (audioSource.clip == clip)
+        {
+            audioSource.Stop();
+            audioSource.clip = null;
         }
     }
 
@@ -108,7 +207,6 @@ public class PlayerMoving : MonoBehaviour
     {
         isClimbing = true;
         rb.gravityScale = 0;
-        // Центрируем игрока на лестнице
         if (currentLadder != null)
         {
             Vector2 ladderCenter = currentLadder.bounds.center;
@@ -146,27 +244,12 @@ public class PlayerMoving : MonoBehaviour
         canClimb = contact;
         currentLadder = contact ? ladder : null;
     }
-    private bool isDead = false;
-    /*public void Die()
-    {
-        if (isDead) return; // Если уже мертв, выходим
 
-        isDead = true;
-        transform.position = startPosition;
-        rb.velocity = Vector2.zero;
-
-        if (GameManager.Instance != null)
-            GameManager.Instance.LoseLife();
-
-        // Через 1 секунду снова разрешаем смерть
-        Invoke("ResetDeath", 1f);
-    }*/
     public void Die()
     {
-        if (isDead) return;
-        if (isImmortal || isDead) return;
+        if (isDead || isImmortal) return;
+
         isDead = true;
-        // Заменяем startPosition на позицию из GameManager
         transform.position = GameManager.Instance.lastCheckpointPosition;
         rb.velocity = Vector2.zero;
 
@@ -180,6 +263,7 @@ public class PlayerMoving : MonoBehaviour
     {
         isDead = false;
     }
+
     public void ActivateImmortality(float duration)
     {
         if (!isImmortal)
@@ -195,7 +279,6 @@ public class PlayerMoving : MonoBehaviour
 
         while (timer < duration)
         {
-            // Эффект мерцания
             spriteRenderer.color = Color.Lerp(originalColor, Color.cyan, Mathf.PingPong(timer * blinkSpeed, 1));
             timer += Time.deltaTime;
             yield return null;
@@ -205,5 +288,20 @@ public class PlayerMoving : MonoBehaviour
         isImmortal = false;
     }
 
+    // 🔊 Новый метод: Звук при столкновении с врагом
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Vrag") && !isImmortal)
+        {
+            if (hitByEnemySound != null)
+            {
+                audioSource.PlayOneShot(hitByEnemySound);
+            }
 
+            // Активируем неуязвимость на 1.5 секунды после получения урона
+            ActivateImmortality(0.1f);
+
+            Die(); // теперь будет вызван только один раз
+        }
+    }
 }
