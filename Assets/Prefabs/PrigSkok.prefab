@@ -177,4 +177,4 @@ MonoBehaviour:
   bridgeAnimator: {fileID: 0}
   bounceAnimationName: BridgeBounce
   bounceParticles: {fileID: 0}
-  bounceSound: {fileID: 0}
+  bounceSound: {fileID: 8300000, guid: b77d6e6734b081d4fabceb92f9ddda99, type: 3}

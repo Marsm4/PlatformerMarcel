@@ -5566,6 +5566,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 596b9d4b19164444692b0046e6155766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  victoryMusic: {fileID: 8300000, guid: 312368ba8023dd34eb6ac5d875282984, type: 3}
+  musicDuration: 5
 --- !u!212 &1202427391
 SpriteRenderer:
   m_ObjectHideFlags: 0

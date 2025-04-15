@@ -155,6 +155,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 87e60c12f72ed0b4b970ef361b38fd32, type: 3}
   - {fileID: 8300000, guid: 87e60c12f72ed0b4b970ef361b38fd32, type: 3}
   footstepInterval: 0.3
+  hitByEnemySound: {fileID: 8300000, guid: 67f4f1b0702674a4fbeb7ea6546e30e9, type: 3}
 --- !u!61 &7675848012835291423
 BoxCollider2D:
   m_ObjectHideFlags: 0

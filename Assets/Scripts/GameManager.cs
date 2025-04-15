@@ -1,7 +1,7 @@
 using UnityEngine.SceneManagement;
 using UnityEngine;
 using UnityEngine.UI;
-
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -23,12 +23,14 @@ public class GameManager : MonoBehaviour
     [Header("Панели")]
     public GameObject gameOverPanel;
     public GameObject winPanel;
-    public GameObject pausePanel; // Панель паузы
+    public GameObject pausePanel;
     public Text resultText;
 
     [Header("Звуки")]
     public AudioClip gameOverSound;
     public AudioClip winSound;
+    public AudioClip deathMusic;
+    public float deathMusicDuration = 5f;
     public AudioClip pauseSound;
     public AudioClip unpauseSound;
 
@@ -39,7 +41,7 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-          //DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -52,7 +54,6 @@ public class GameManager : MonoBehaviour
 
     void InitializeGame()
     {
-        // Инициализация чекпоинта
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -62,19 +63,16 @@ public class GameManager : MonoBehaviour
         currentLives = maxLives;
         audioSource = GetComponent<AudioSource>();
 
-        // Скрываем все панели при старте
         if (gameOverPanel != null) gameOverPanel.SetActive(false);
         if (winPanel != null) winPanel.SetActive(false);
-        if (pausePanel != null) pausePanel.SetActive(false); // Гарантируем, что панель паузы скрыта
+        if (pausePanel != null) pausePanel.SetActive(false);
 
-        // Убедимся, что игра не на паузе при старте
         Time.timeScale = 1f;
         isPaused = false;
     }
 
     void Update()
     {
-        // Обработка паузы по клавише Esc
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             TogglePause();
@@ -84,7 +82,6 @@ public class GameManager : MonoBehaviour
     #region Pause System
     public void TogglePause()
     {
-        // Не позволяем паузить при game over или победе
         if ((gameOverPanel != null && gameOverPanel.activeSelf) ||
             (winPanel != null && winPanel.activeSelf))
             return;
@@ -103,10 +100,10 @@ public class GameManager : MonoBehaviour
 
     void PauseGame()
     {
-        Time.timeScale = 0f; // Останавливаем игру
+        Time.timeScale = 0f;
         if (pausePanel != null)
         {
-            pausePanel.SetActive(true); // Показываем панель только при паузе
+            pausePanel.SetActive(true);
         }
         if (pauseSound != null && audioSource != null)
         {
@@ -116,10 +113,10 @@ public class GameManager : MonoBehaviour
 
     public void ResumeGame()
     {
-        Time.timeScale = 1f; // Возобновляем игру
+        Time.timeScale = 1f;
         if (pausePanel != null)
         {
-            pausePanel.SetActive(false); // Скрываем панель
+            pausePanel.SetActive(false);
         }
         if (unpauseSound != null && audioSource != null)
         {
@@ -162,7 +159,6 @@ public class GameManager : MonoBehaviour
         if (player != null)
         {
             player.transform.position = lastCheckpointPosition;
-            // Дополнительные действия при респавне
         }
     }
 
@@ -200,7 +196,32 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
         gameOverPanel.SetActive(true);
         resultText.text = $"Вы проиграли!\nСобрано монет: {score}";
-        PlaySound(gameOverSound);
+
+        if (audioSource != null)
+        {
+            PlaySound(gameOverSound);
+            if (deathMusic != null)
+            {
+                StartCoroutine(PlayDeathMusic(deathMusicDuration));
+            }
+        }
+    }
+
+    IEnumerator PlayDeathMusic(float duration)
+    {
+        if (audioSource == null) yield break;
+
+        audioSource.Stop();
+        audioSource.clip = deathMusic;
+        audioSource.loop = false;
+        audioSource.Play();
+
+        yield return new WaitForSecondsRealtime(duration);
+
+        if (audioSource != null && audioSource.clip == deathMusic)
+        {
+            audioSource.Stop();
+        }
     }
 
     public void WinGame()

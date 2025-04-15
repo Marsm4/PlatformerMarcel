@@ -31,12 +31,10 @@ public class PlayerMoving : MonoBehaviour
     public AudioClip jumpSound;
     public AudioClip[] footstepSounds;
     public float footstepInterval = 0.3f;
-    public AudioClip hitByEnemySound; // Новый звук столкновения
+    public AudioClip hitByEnemySound;
 
     private AudioSource audioSource;
-   // private float footstepTimer = 0f;
     private bool isDead = false;
-
     private bool hasJumped = false;
     private bool isFootstepPlaying = false;
     private Coroutine jumpCoroutine = null;
@@ -135,7 +133,8 @@ public class PlayerMoving : MonoBehaviour
 
     void HandleJump()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && (isGrounded || isClimbing))
+        // Изменено: проверяем как пробел, так и клавишу W
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W)) && (isGrounded || isClimbing))
         {
             hasJumped = true;
 
@@ -288,7 +287,6 @@ public class PlayerMoving : MonoBehaviour
         isImmortal = false;
     }
 
-    // 🔊 Новый метод: Звук при столкновении с врагом
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Vrag") && !isImmortal)
@@ -298,10 +296,8 @@ public class PlayerMoving : MonoBehaviour
                 audioSource.PlayOneShot(hitByEnemySound);
             }
 
-            // Активируем неуязвимость на 1.5 секунды после получения урона
             ActivateImmortality(0.1f);
-
-            Die(); // теперь будет вызван только один раз
+            Die();
         }
     }
 }

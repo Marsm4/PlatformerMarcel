@@ -134,7 +134,7 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
-  deathSound: {fileID: 8300000, guid: 959d7771fb6c4c54e9a4291578b66a7b, type: 3}
+  deathSound: {fileID: 8300000, guid: 67f4f1b0702674a4fbeb7ea6546e30e9, type: 3}
 --- !u!61 &4805410775734616503
 BoxCollider2D:
   m_ObjectHideFlags: 0

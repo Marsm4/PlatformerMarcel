@@ -706,6 +706,8 @@ MonoBehaviour:
   resultText: {fileID: 1824638540}
   gameOverSound: {fileID: 8300000, guid: bbacd9d47fcd0d449af97eba85963d0e, type: 3}
   winSound: {fileID: 8300000, guid: 312368ba8023dd34eb6ac5d875282984, type: 3}
+  deathMusic: {fileID: 8300000, guid: bbacd9d47fcd0d449af97eba85963d0e, type: 3}
+  deathMusicDuration: 5
   pauseSound: {fileID: 0}
   unpauseSound: {fileID: 0}
 --- !u!4 &204150365
@@ -6381,6 +6383,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 596b9d4b19164444692b0046e6155766, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  victoryMusic: {fileID: 8300000, guid: 312368ba8023dd34eb6ac5d875282984, type: 3}
+  musicDuration: 5
 --- !u!212 &2022840861
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -14,6 +14,7 @@ public class UrovenMenu : MonoBehaviour
     public Button level4Button;
     public Button level5Button;
     public Button superLevel;
+    public Button GlavnoeMenu;
     void Start()
     {
         // Назначаем обработчики событий для кнопок
@@ -22,6 +23,7 @@ public class UrovenMenu : MonoBehaviour
         level3Button.onClick.AddListener(() => LoadLevel("Level3"));
         level4Button.onClick.AddListener(() => LoadLevel("Level4"));
         level5Button.onClick.AddListener(() => LoadLevel("Level5"));
+        GlavnoeMenu.onClick.AddListener(() => LoadLevel("GlavnoeMenu"));
         superLevel.onClick.AddListener(() => LoadLevel("SuperLevel"));
     }
 

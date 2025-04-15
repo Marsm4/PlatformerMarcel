@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SuperLevel.unity
     guid: 6d8afb9fb451a9a4c9196a571cb98399
+  - enabled: 1
+    path: Assets/Scenes/GlavnoeMenu.unity
+    guid: 99566d3aa51fa1845b1da709cbf8eb47
   m_configObjects: {}
